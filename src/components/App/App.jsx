@@ -2,6 +2,7 @@ import { Component } from "react";
 import { fetchImages } from "services/api";
 import Searchbar from 'components/Searchbar/Searchbar';
 import ImageGallery from 'components/ImageGallery/ImageGallery'
+import {AppContainer} from './App.styled'
 
 export default class App extends Component {
     state = {
@@ -26,10 +27,10 @@ export default class App extends Component {
     render() {
         const { query,status,hits } = this.state;
 
-        return <div>
+        return <AppContainer>
             <Searchbar onSubmit={this.onSubmit} />
             
             {status === 'ok' && <ImageGallery galleryItems={hits} />}
-        </div>
+        </AppContainer>
     }
 }

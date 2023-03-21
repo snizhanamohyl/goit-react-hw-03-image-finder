@@ -1,5 +1,7 @@
-import { Component } from "react"
-import { SearchField, SearchForm, SearchFormBtn, SearchFormInput } from "./Searchbar.styled"
+import { Notify } from "notiflix";
+import { Component } from "react";
+import { Search } from "react-bootstrap-icons";
+import { SearchField, SearchForm, SearchFormBtn, SearchFormInput } from "./Searchbar.styled";
 
 export default class Searchbar extends Component {
     state = {
@@ -10,17 +12,25 @@ export default class Searchbar extends Component {
         this.setState({ inputValue: target.value })
     }
 
-    render() {
+    onSubmitBtnClick = (e) => {
+        e.preventDefault();
+
         const { onSubmit } = this.props;
         const { inputValue } = this.state;
 
+        if (!inputValue) { 
+            Notify.info('Please, enter a search query') }
+        else {
+            this.setState({ inputValue: '' })
+            onSubmit(inputValue)}
+    }
+    render() {
+        const { inputValue } = this.state;
+
         return <SearchField className="searchbar">
-            <SearchForm onSubmit={(e) => {
-                this.setState({ inputValue: '' })
-                onSubmit(e, inputValue)
-            }}>
+            <SearchForm onSubmit={this.onSubmitBtnClick}>
                 <SearchFormBtn type="submit">
-                    <span>S</span>
+                    <Search  size={16}/>
                 </SearchFormBtn>
 
                 <SearchFormInput

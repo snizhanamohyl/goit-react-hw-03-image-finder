@@ -3,6 +3,7 @@ import { Component } from "react";
 import Searchbar from 'components/Searchbar/Searchbar';
 import Loader from 'components/Loader/Loader'
 import ImageGallery from 'components/ImageGallery/ImageGallery'
+import Error from 'components/Error/Error';
 import Button from "components/Button/Button";
 import SearchImages from 'services/api'
 import { AppContainer } from './App.styled'
@@ -35,14 +36,14 @@ export default class App extends Component {
                 searchImages.fetchImages()
             .then(({ hits }) => {
                 if (hits.length === 0) throw new Error(noResultsMsg);
-                
+
                 const endOfGallery = (hits.length < 12);
-                if (endOfGallery) this.setState({showBtn: false})
+                this.setState({showBtn: endOfGallery ? false : true })
                     
                 this.setState((prevState) =>
                     ({ hits: [...prevState.hits, ...hits] }))
                 
-            }).catch(error => { 
+            }).catch((error) => {
                 this.setState({ error: error.message, status: STATUS.REJECTED, showBtn: false })
             })
             .finally(this.setState({ status: STATUS.RESOLVED, showLoader: false }))
@@ -50,10 +51,8 @@ export default class App extends Component {
         }
     }
 
-    onSubmit = (e, value) => {
-        e.preventDefault();
-
-        this.setState({ hits: [], status: STATUS.PENDING, error: '', showLoader: false  })
+    onSubmit = (value) => {
+        this.setState({ hits: [], status: STATUS.PENDING, showLoader: false  })
 
         searchImages.query = value;
         searchImages.page = 1;
@@ -62,7 +61,7 @@ export default class App extends Component {
     onClick = () => {
         searchImages.page += 1;
 
-        this.setState({ status: STATUS.PENDING, error: '', showLoader: true })
+        this.setState({ status: STATUS.PENDING, showLoader: true })
     }
 
     render() {
@@ -72,7 +71,7 @@ export default class App extends Component {
             <Searchbar onSubmit={this.onSubmit} />
             {(status === STATUS.RESOLVED || status === STATUS.PENDING) && <ImageGallery galleryItems={hits} showLoader={showLoader} />}
             {(status === STATUS.PENDING) && <Loader></Loader>}
-            {(status === STATUS.REJECTED) && (error === noResultsMsg ? <div>{error}</div> : <div>Something went wrong</div>)}
+            {(status === STATUS.REJECTED) && <Error msg={error ? 'Oops, something went wrong' : noResultsMsg}></Error>}
             {showBtn && <Button onClick={this.onClick} disabled={status === STATUS.PENDING}></Button>}
         </AppContainer>
     }

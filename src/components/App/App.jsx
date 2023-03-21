@@ -23,24 +23,28 @@ export default class App extends Component {
         hits: [],
         error: '',
         status: STATUS.IDLE,
+        showBtn: false,
     }
 
     componentDidUpdate(prevProps, prevState) {
         const { status } = this.state;
 
         if (prevState.status !== status && status === STATUS.PENDING) {
-            searchImages.fetchImages()
+            setTimeout(() => {
+                searchImages.fetchImages()
             .then(({ hits }) => {
                 if (hits.length === 0) throw new Error(noResultsMsg);
                 
-
+                const endOfGallery = (hits.length < 12);
+                    
                 this.setState((prevState) =>
-                ({ hits: [...prevState.hits, ...hits] }))
+                    ({ hits: [...prevState.hits, ...hits], showBtn: !endOfGallery }))
                 
             }).catch(error => { 
-                this.setState({ error: error.message, status: STATUS.REJECTED })
+                this.setState({ error: error.message, status: STATUS.REJECTED, showBtn: false })
             })
-            .finally(this.setState({ status: STATUS.RESOLVED }));
+            .finally(this.setState({ status: STATUS.RESOLVED }))
+            }, 1000)
         }
     }
 
@@ -60,14 +64,14 @@ export default class App extends Component {
     }
 
     render() {
-        const { hits, error, status } = this.state;
+        const { hits, error, showBtn, status } = this.state;
         
         return <AppContainer>
             <Searchbar onSubmit={this.onSubmit} />
-            {(status === STATUS.PENDING) && <Loader></Loader>}
             {(status === STATUS.RESOLVED) && <ImageGallery galleryItems={hits} />}
+            {(status === STATUS.PENDING) && <Loader></Loader>}
             {(status === STATUS.REJECTED) && (error === noResultsMsg ? <div>{error}</div> : <div>Something went wrong</div>)}
-            <Button onClick={this.onClick} ></Button>
+            {showBtn && <Button onClick={this.onClick} disabled={status === STATUS.PENDING}></Button>}
         </AppContainer>
     }
 }

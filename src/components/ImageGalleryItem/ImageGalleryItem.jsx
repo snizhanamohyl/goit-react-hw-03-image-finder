@@ -19,13 +19,13 @@ export default class ImageGalleryItem extends Component {
     }
 
     render() {
-        const { id, webformatURL, largeImageURL } = this.props.item;
+        const { id, webformatURL, largeImageURL, tags } = this.props.item;
         const { showModal } = this.state;
 
         return <>
-            {showModal && <Modal closeModal={this.toggleModal} imgURL={largeImageURL}/>}
+            {showModal && <Modal closeModal={this.toggleModal} imgURL={largeImageURL} tags={tags } />}
             <GalleryItem key={id} >
-                <GalleryItemImg src={webformatURL} alt="image" onClick={this.onClick}/>
+                <GalleryItemImg src={webformatURL} alt={tags} onClick={this.onClick}/>
             </GalleryItem>
         </>
     }

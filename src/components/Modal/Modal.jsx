@@ -31,11 +31,11 @@ export default class Modal extends Component  {
     }
 
     render() {
-        const {imgURL} = this.props;
+        const {imgURL, tags} = this.props;
 
         return createPortal(<Overlay onClick={this.handleBackdropClick}> 
             <ModalWindow>
-                <img src={imgURL} alt="#" />
+                <img src={imgURL} alt={tags} width="600px"/>
             </ModalWindow>
         </Overlay>, modalRoot)
     }

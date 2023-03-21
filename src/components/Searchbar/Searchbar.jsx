@@ -1,5 +1,6 @@
-import { Notify } from "notiflix";
 import { Component } from "react";
+import { Notify } from "notiflix";
+import PropTypes from 'prop-types'; 
 import { Search } from "react-bootstrap-icons";
 import { SearchField, SearchForm, SearchFormBtn, SearchFormInput } from "./Searchbar.styled";
 
@@ -46,3 +47,7 @@ export default class Searchbar extends Component {
         </SearchField>
     }
 } 
+
+Searchbar.propTypes = {
+    onSubmit: PropTypes.func.isRequired,
+}

@@ -32,6 +32,7 @@ export default class App extends Component {
         const { status } = this.state;
 
         if (prevState.status !== status && status === STATUS.PENDING) {
+            this.setState({ showBtn: false });
             setTimeout(() => {
                 searchImages.fetchImages()
             .then(({ hits }) => {
@@ -41,10 +42,10 @@ export default class App extends Component {
                 this.setState({showBtn: endOfGallery ? false : true })
                     
                 this.setState((prevState) =>
-                    ({ hits: [...prevState.hits, ...hits] }))
+                    ({ hits: [...prevState.hits, ...hits]}))
                 
             }).catch((error) => {
-                this.setState({ error: error.message, status: STATUS.REJECTED, showBtn: false })
+                this.setState({ error: error.message, status: STATUS.REJECTED })
             })
             .finally(this.setState({ status: STATUS.RESOLVED, showLoader: false }))
             }, 1000)
@@ -65,14 +66,14 @@ export default class App extends Component {
     }
 
     render() {
-        const { hits, error, showBtn, status, showLoader } = this.state;
+        const { hits, error, showBtn, status } = this.state;
         
         return <AppContainer>
             <Searchbar onSubmit={this.onSubmit} />
-            {(status === STATUS.RESOLVED || status === STATUS.PENDING) && <ImageGallery galleryItems={hits} showLoader={showLoader} />}
+            {(status === STATUS.RESOLVED || status === STATUS.PENDING) && <ImageGallery galleryItems={hits}/>}
             {(status === STATUS.PENDING) && <Loader></Loader>}
             {(status === STATUS.REJECTED) && <Error msg={error ? 'Oops, something went wrong' : noResultsMsg}></Error>}
-            {showBtn && <Button onClick={this.onClick} disabled={status === STATUS.PENDING}></Button>}
+            {showBtn && <Button onClick={this.onClick}></Button>}
         </AppContainer>
     }
 }

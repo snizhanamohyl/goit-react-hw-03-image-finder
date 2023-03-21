@@ -1,8 +1,8 @@
 import { Component } from "react";
 
 import Searchbar from 'components/Searchbar/Searchbar';
-import ImageGallery from 'components/ImageGallery/ImageGallery'
 import Loader from 'components/Loader/Loader'
+import ImageGallery from 'components/ImageGallery/ImageGallery'
 import Button from "components/Button/Button";
 import SearchImages from 'services/api'
 import { AppContainer } from './App.styled'
@@ -24,6 +24,7 @@ export default class App extends Component {
         error: '',
         status: STATUS.IDLE,
         showBtn: false,
+        showLoader: false,
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -36,14 +37,15 @@ export default class App extends Component {
                 if (hits.length === 0) throw new Error(noResultsMsg);
                 
                 const endOfGallery = (hits.length < 12);
+                if (endOfGallery) this.setState({showBtn: false})
                     
                 this.setState((prevState) =>
-                    ({ hits: [...prevState.hits, ...hits], showBtn: !endOfGallery }))
+                    ({ hits: [...prevState.hits, ...hits] }))
                 
             }).catch(error => { 
                 this.setState({ error: error.message, status: STATUS.REJECTED, showBtn: false })
             })
-            .finally(this.setState({ status: STATUS.RESOLVED }))
+            .finally(this.setState({ status: STATUS.RESOLVED, showLoader: false }))
             }, 1000)
         }
     }
@@ -51,7 +53,7 @@ export default class App extends Component {
     onSubmit = (e, value) => {
         e.preventDefault();
 
-        this.setState({ hits: [], status: STATUS.PENDING, error: ''  })
+        this.setState({ hits: [], status: STATUS.PENDING, error: '', showLoader: false  })
 
         searchImages.query = value;
         searchImages.page = 1;
@@ -60,15 +62,15 @@ export default class App extends Component {
     onClick = () => {
         searchImages.page += 1;
 
-        this.setState({ status: STATUS.PENDING, error: '' })
+        this.setState({ status: STATUS.PENDING, error: '', showLoader: true })
     }
 
     render() {
-        const { hits, error, showBtn, status } = this.state;
+        const { hits, error, showBtn, status, showLoader } = this.state;
         
         return <AppContainer>
             <Searchbar onSubmit={this.onSubmit} />
-            {(status === STATUS.RESOLVED) && <ImageGallery galleryItems={hits} />}
+            {(status === STATUS.RESOLVED || status === STATUS.PENDING) && <ImageGallery galleryItems={hits} showLoader={showLoader} />}
             {(status === STATUS.PENDING) && <Loader></Loader>}
             {(status === STATUS.REJECTED) && (error === noResultsMsg ? <div>{error}</div> : <div>Something went wrong</div>)}
             {showBtn && <Button onClick={this.onClick} disabled={status === STATUS.PENDING}></Button>}

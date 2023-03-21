@@ -12,11 +12,12 @@ export default class Searchbar extends Component {
 
     render() {
         const { onSubmit } = this.props;
+        const { inputValue } = this.state;
 
         return <SearchField className="searchbar">
             <SearchForm onSubmit={(e) => {
                 this.setState({ inputValue: '' })
-                onSubmit(e, this.state.inputValue)
+                onSubmit(e, inputValue)
             }}>
                 <SearchFormBtn type="submit">
                     <span>S</span>
@@ -28,7 +29,7 @@ export default class Searchbar extends Component {
                 autoComplete="off"
                 autoFocus
                 placeholder="Search images and photos"
-                value={this.state.inputValue}
+                value={inputValue}
                 onChange={this.onChange}
                 />
             </SearchForm>
